@@ -1,0 +1,838 @@
+@@ -0,0 +1,837 @@
+module warning(
+    input               sys_clk  ,  //ϵͳʱ��
+    input               sys_rst_n,  //ϵͳ��λ���͵�ƽ��Ч	 
+    
+//   input    [4:0]      key_flag,    //������Ч�ź�
+//   input    [4:0]      key_value,	//������İ����ź� 
+    
+    output  reg  [15:0]  led,         //4��LED��
+    
+//    input   [4:0]         key,              //�ⲿ��������
+    input    [3:0]         key_1,              //�ⲿ��������3210�� 1234
+    output  reg  [3:0]         key_2,              //�ⲿ��������3210��0123
+   output  reg      [3:0]          wei  ,  //λѡ
+   output  reg      [4:0]         numb     //����
+
+    );
+    
+reg [31:0] ti;
+
+reg [4:0]  numb_each [7:0]; 
+
+reg [71:0] numb_all;
+
+reg [31:0] count,count_delay;
+reg  flag_key,flag_dalay,flag_dalay_2;
+
+always @(posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        count_delay <= 32'd0; 
+        flag_dalay_2 <= 1'b0;      
+        end
+//    else  if (( flag_dalay == 1'b1 )&&(flag_dalay_2 == 1'b0))   begin
+//          count_delay <= 32'd0;
+//          flag_dalay_2 <= 1'b1;
+//          end
+//          else if ( flag_dalay == 1'b1 )
+//          count_delay = count_delay + 1'b1;
+//          else begin
+//          flag_dalay_2 <= 1'b0;
+//          count_delay <= 32'd0; 
+//          end
+    else  if ( flag_dalay == 1'b1 )
+          count_delay = count_delay + 1'b1;
+          else begin
+          count_delay <= 32'd0; 
+          end
+end
+
+
+always @(posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        count <= 32'd0; 
+        end
+    else  if ( flag_key == 1'b0 ) begin
+          if (  count <= 32'd2500000 )
+         count <= count + 1'b1;
+         else
+         count <= 32'd0; 
+       end
+     else
+     count <= count; 
+end
+      
+ always @(posedge sys_clk or negedge sys_rst_n) begin 
+     if (!sys_rst_n) begin
+        key_2 <= 4'b0111;
+        end
+     else  if(count == 32'd2500001)
+        key_2  <= { key_2[2:0], key_2[3] };
+        else
+        key_2 <= key_2;
+end
+//always @(posedge sys_clk) begin
+//   if (!sys_rst_n) begin
+//   	 wei <= 4'd7;
+//	// numb <= 5'd0;   
+//	 end
+//	   else   case( ti )
+//	                32'd0: begin
+//	                wei <= 4'd7;
+//	                numb <= numb_each[0];   
+//	                end
+//	                32'd100000:begin
+//	                wei <= 4'd6;
+//	                numb <= numb_each[1];  
+//	                end
+//	                32'd200000:begin
+//	                wei <= 4'd5;
+//	                numb <= numb_each[2];  
+//	                end
+//	                32'd300000: begin
+//	                wei <= 4'd4;
+//	                numb <= numb_each[3];  
+//	                end
+//	                32'd400000: begin
+//	                wei <= 4'd3;
+//	                numb <= numb_each[4];  
+//	                end
+//	                32'd500000: begin
+//	                wei <= 4'd2;
+//	                numb <= numb_each[5];  
+//	                end	                
+//	                32'd600000: begin
+//	                wei <= 4'd1;
+//	                numb <= numb_each[6];  
+//	                end	                
+//	                32'd700000: begin
+//	                wei <= 4'd0;
+//	                numb <= numb_each[7];  
+//	                end
+//	                default:numb <= numb;  
+//	            endcase
+//end
+
+
+
+always @(posedge sys_clk or negedge sys_rst_n) begin   
+   if (!sys_rst_n) 
+       ti <= 32'd0;
+   else if ( ti < 32'd800000 )
+       ti <= ti+1'b1;
+       else 
+        ti <= 32'd0;
+end
+always @(posedge sys_clk) begin
+   if (!sys_rst_n) begin
+   	 wei <= 4'd7;
+	// numb <= 5'd0;   
+	 end
+	   else   case( ti )
+	                32'd0: begin
+	                wei <= 4'd7;
+	                numb <= numb_all>>8'd8;   
+	                end
+	                32'd100000:begin
+	                wei <= 4'd6;
+	                numb <= numb_all>>8'd16;  
+	                end
+	                32'd200000:begin
+	                wei <= 4'd5;
+	                numb <= numb_all>>8'd24;  
+	                end
+	                32'd300000: begin
+	                wei <= 4'd4;
+	                numb <= numb_all>>8'd32;  
+	                end
+	                32'd400000: begin
+	                wei <= 4'd3;
+	                numb <= numb_all>>8'd40; 
+	                end
+	                32'd500000: begin
+	                wei <= 4'd2;
+	                numb <= numb_all>>8'd48;  
+	                end	                
+	                32'd600000: begin
+	                wei <= 4'd1;
+	                numb <= numb_all>>8'd56; 
+	                end	                
+	                32'd700000: begin
+	                wei <= 4'd0;
+	                numb <= numb_all>>8'd64; 
+	                end
+	                default:numb <= numb;  
+	            endcase
+end
+
+reg [3:0] timi;
+
+reg [7:0] n1=8'b00000000;
+reg [7:0] n2=8'b11111111;
+
+reg [63:0] part1,part2,part3,part4,part5,part6,part7,part8,part9,part_in,part_out;
+
+reg [63:0] part_out_1,part_out_2,part_out_3,part_out_4,part_out_5,part_out_6,part_out_7,part_out_8,part_out_9;
+
+reg[1:0] xishu1,xishu2,xishu3,xishu4,xishu5,xishu6,xishu7,xishu8;
+
+reg[31:0] bufen1,bufen2,bufen3,bufen4,bufen5,bufen6,bufen7,bufen8;
+
+
+reg[7:0] fenjie1,fenjie2,fenjie3,fenjie4,fenjie5,fenjie6,fenjie7,fenjie8;
+reg[7:0] zhuhe1,zhuhe2,zhuhe3,zhuhe4,zhuhe5,zhuhe6,zhuhe7,zhuhe8;
+
+reg [3:0] flag1,flag2;//flag2[0] +     flag2[1] -       flag2[2] *     flag2[3] / 
+
+always @(posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        led[7:0] <= 8'd0; 
+//        led[6] <= 1'b0;
+        numb_all <= {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+        timi <= 4'd0;
+        flag1 <= 4'd0;
+        flag2 <= 4'd0;
+        flag_key <= 0;
+        flag_dalay <= 0;
+        end
+   else  case( key_2 )  
+        4'b1110:                                       //0   /*
+        begin 
+        case( key_1 )  
+        4'b1110: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1110)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        numb_all = numb_all+5'd0 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end
+        end
+        4'b1101: ;
+//        begin
+//         flag_dalay = 1'b1;
+//         if((flag_key == 1'b0) &&(key_1 == 4'b1101)&&( count_delay >= 32'd2000000))
+//        begin  
+//        flag_key = 1'b1;
+//        flag_dalay = 1'b0;
+//        numb_all = numb_all+5'd8 ;
+//        numb_all = numb_all << 5'd8; 
+//        timi = timi+1'b1;
+//        end
+//        end
+        4'b1011: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1011)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        timi <= 4'd0;
+        flag1 = flag1+1'b1;
+        flag2 = 4'b1000;
+        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+        end
+        end
+        4'b0111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b0111)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        timi <= 4'd0;
+        flag1 = flag1+1'b1;
+        flag2 = 4'b0100;
+        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+        end
+        end
+        
+        4'b1111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b1) &&(key_1 == 4'b1111)&&( count_delay >= 32'd1000000))
+        begin  
+        flag_key = 1'b0;
+        flag_dalay = 1'b0;
+        end
+        end
+	         default:;
+//	         flag_key <= 1'b0;
+	            endcase  
+	    end  
+	        
+        4'b1101:                                        //789   -
+        begin 
+        case( key_1 )  
+        4'b1110: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1110)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        numb_all = numb_all+5'd7 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end
+        end
+        4'b1101: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1101)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        numb_all = numb_all+5'd8 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end
+        end
+        4'b1011: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1011)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        numb_all = numb_all+5'd9 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end
+        end
+        4'b0111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b0111)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag_dalay = 1'b0;
+        timi <= 4'd0;
+        flag1 = flag1+1'b1;
+        flag2 = 4'b0010;
+        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+        end
+        end
+        
+        4'b1111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b1) &&(key_1 == 4'b1111)&&( count_delay >= 32'd1000000))
+        begin  
+        flag_key = 1'b0;
+        flag_dalay = 1'b0;
+        end
+        end
+	         default:;
+//	         flag_key <= 1'b0;
+	            endcase  
+	    end  
+	    
+        4'b1011:                                        //456     +
+        begin 
+        case( key_1 )  
+        4'b1110: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1110)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd4 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end
+        end
+        4'b1101:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1101)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd5 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end 
+        end
+        4'b1011:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1011)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd6 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end 
+        end
+        4'b0111:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b0111)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        timi <= 4'd0;
+        flag1 = flag1+1'b1;
+        flag2 = 4'b0001;
+        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+        end 
+        end
+        4'b1111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b1) &&(key_1 == 4'b1111)&&( count_delay >= 32'd1000000))
+        begin  
+        flag_key = 1'b0;
+        flag_dalay = 1'b0;
+        end
+        end
+	         default:;
+//	         flag_key <= 1'b0; 
+	            endcase  
+	    end  
+	            
+        4'b0111:                                        //123    =
+        begin 
+        case( key_1 )  
+        4'b1110:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1110)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd1 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end 
+        end
+        4'b1101:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1101)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd2 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end 
+        end
+        4'b1011:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b1011)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        numb_all = numb_all+5'd3 ;
+        numb_all = numb_all << 5'd8; 
+        timi = timi+1'b1;
+        end 
+        end
+        4'b0111:
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b0) &&(key_1 == 4'b0111)&&( count_delay >= 32'd2000000))
+        begin  
+        flag_key = 1'b1;
+        flag1 = 4'hf;
+//        numb_all = {zhuhe8,zhuhe7,zhuhe6,zhuhe5,zhuhe4,zhuhe3,zhuhe2,zhuhe1,n1};
+        numb_all = {fenjie8,fenjie7,fenjie6,fenjie5,fenjie4,fenjie3,fenjie2,fenjie1,n1};
+        end 
+        end
+        4'b1111: 
+        begin
+         flag_dalay = 1'b1;
+         if((flag_key == 1'b1) &&(key_1 == 4'b1111)&&( count_delay >= 32'd1000000))
+        begin  
+        flag_key = 1'b0;
+        flag_dalay = 1'b0;
+        end
+        end
+	         default:;
+//	         flag_key <= 1'b0;
+	            endcase  
+	    end  
+	         default:;  
+	            endcase  
+//   else  if(( key_flag & (key_value ))!=5'b00000) begin
+//   case( key_flag & (key_value ))
+//	  5'b00001: begin
+//        led[4:0] <= 5'b00001;
+//        numb_all = numb_all+5'd1 ;
+//        numb_all = numb_all << 5'd8; 
+//        timi = timi+1'b1;
+//        end
+//	  5'b00010: begin
+//        led[4:0] <= 5'b00010;
+//        numb_all = numb_all+5'd2 ;
+//        numb_all = numb_all << 5'd8; 
+//        timi = timi+1'b1;
+//        end
+////	  5'b00100: begin
+////        led[4:0] <= 5'b00100;
+////        numb_all = numb_all+5'd3 ;
+////        numb_all = numb_all << 5'd8; 
+////        timi = timi+1'b1;
+////        end
+
+//	  5'b00100: begin
+//        timi <= 4'd0;
+//        flag1 = flag1+1'b1;
+//        flag2 = 4'b0010;
+//        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+//        end 
+        
+//	  5'b01000: begin
+////        led[4:0] <= 5'b01000;
+//        timi <= 4'd0;
+//        flag1 = flag1+1'b1;
+//        flag2 = 4'b0001;
+//        numb_all = {n2,n2,n2,n2,n2,n2,n2,n2,n1};
+//        end 
+        
+//	  5'b10000: begin
+////        led[4:0] <= 5'b10000;
+////        timi = 4'd0;
+////        part3 = part_in;
+////        part_out = part2 + part3;
+////        #10
+//        flag1 = 4'hf;
+//        numb_all = {zhuhe8,zhuhe7,zhuhe6,zhuhe5,zhuhe4,zhuhe3,zhuhe2,zhuhe1,n1};
+////        numb_all = ~(72'd0 | {fenjie8,fenjie7,fenjie6,fenjie5,fenjie4,fenjie3,fenjie2,fenjie1,n2});
+////        numb_all = {n2,n2,n2,n2,n2,n2,n2,4'b0000,timi,n1};
+////        led[6] <= 1'b1;
+//        end  
+        
+        
+////	  5'b01000: begin
+////        led <= 5'b01000;
+////        numb_all = numb_all+5'd4 ;
+////        numb_all = numb_all << 5'd8; 
+////        end 
+////	  5'b10000: begin
+////        led <= 5'b10000;
+////        numb_all = numb_all+5'd5 ;
+////        numb_all = numb_all << 5'd8; 
+////        end     
+//	         default:;  
+//	            endcase  
+//        end
+end
+
+
+
+always @ (posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+//        led[7] <= 1'b0;
+        end
+    else if(timi != 4'd0) begin
+//        led[7] <= 1'b1;
+       xishu1 <= (timi<1)?0:1;
+       xishu2 <= (timi<2)?0:1;
+       xishu3 <= (timi<3)?0:1;
+       xishu4 <= (timi<4)?0:1;
+       xishu5 <= (timi<5)?0:1;
+       xishu6 <= (timi<6)?0:1;
+       xishu7 <= (timi<7)?0:1;
+       xishu8 <= (timi<8)?0:1;
+//       part_in = numb_all[71:64]*10000000*xishu8+numb_all[63:56]*1000000*xishu7+numb_all[55:48]*100000*xishu6+numb_all[47:40]*10000*xishu5+numb_all[39:32]*1000*xishu4+numb_all[31:24]*100*xishu3+numb_all[23:16]*10*xishu2+numb_all[15:8]*xishu1;
+end
+end
+
+always @ (posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+       bufen1 <= 32'd0;
+       bufen2 <= 32'd0;
+       bufen3 <= 32'd0;
+       bufen4 <= 32'd0;
+       bufen5 <= 32'd0;
+       bufen6 <= 32'd0;
+       bufen7 <= 32'd0;
+       bufen8 <= 32'd0;
+        end
+//    else if(timi != 4'd0) begin
+    else if(1) begin
+       bufen1 <= numb_all[15:8]*xishu1;
+       bufen2 <= numb_all[23:16]*10*xishu2;
+       bufen3 <= numb_all[31:24]*100*xishu3;
+       bufen4 <= numb_all[39:32]*1000*xishu4;
+       bufen5 <= numb_all[47:40]*10000*xishu5;
+       bufen6 <= numb_all[55:48]*100000*xishu6;
+       bufen7 <= numb_all[63:56]*1000000*xishu7;
+       bufen8 <= numb_all[71:64]*10000000*xishu8;
+end
+end
+
+
+always @ (posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+       fenjie1 <= 8'd0;
+       fenjie2 <= 8'd0;
+       fenjie3 <= 8'd0;
+       fenjie4 <= 8'd0;
+       fenjie5 <= 8'd0;
+       fenjie6 <= 8'd0;
+       fenjie7 <= 8'd0;
+       fenjie8 <= 8'd0;
+        end
+//    else if(part2 != 64'd0) begin
+    else if(1) begin
+       fenjie8 <= part_out / 32'd10000000;
+       fenjie7 <= (part_out-fenjie8*10000000)/32'd1000000;
+       fenjie6 <= (part_out-fenjie8*10000000-fenjie7*1000000)/32'd100000;
+       fenjie5 <= (part_out-fenjie8*10000000-fenjie7*1000000-fenjie6*100000)/32'd10000;
+       fenjie4 <= (part_out-fenjie8*10000000-fenjie7*1000000-fenjie6*100000-fenjie5*10000)/32'd1000;
+       fenjie3 <= (part_out-fenjie8*10000000-fenjie7*1000000-fenjie6*100000-fenjie5*10000-fenjie4*1000)/32'd100;
+       fenjie2 <= (part_out-fenjie8*10000000-fenjie7*1000000-fenjie6*100000-fenjie5*10000-fenjie4*1000-fenjie3*100)/32'd10;
+       fenjie1 <= (part_out-fenjie8*10000000-fenjie7*1000000-fenjie6*100000-fenjie5*10000-fenjie4*1000-fenjie3*100-fenjie2*10);
+end
+end
+
+//always @ (posedge sys_clk or negedge sys_rst_n) begin
+//    if (!sys_rst_n) begin
+//       zhuhe1 <= 8'd0;
+//       zhuhe2 <= 8'd0;
+//       zhuhe3 <= 8'd0;
+//       zhuhe4 <= 8'd0;
+//       zhuhe5 <= 8'd0;
+//       zhuhe6 <= 8'd0;
+//       zhuhe7 <= 8'd0;
+//       zhuhe8 <= 8'd0;
+            
+//        end
+////    else if(part2 != 64'd0) begin
+//    else if(1) begin
+////       zhuhe1 <= 8'd1;
+////       zhuhe2 <= 8'd2;
+////       zhuhe3 <= 8'd3;
+////       zhuhe4 <= 8'd4;
+////       zhuhe5 <= 8'd5;
+////       zhuhe6 <= 8'd6;
+////       zhuhe7 <= 8'd7;
+////       zhuhe8 <= 8'd8;
+//       zhuhe8 = (fenjie8<1)?8'hff:fenjie8;
+//       zhuhe7 = (fenjie7<1)?8'hff:fenjie7;
+//       zhuhe6 = (fenjie6<1)?8'hff:fenjie6;
+//       zhuhe5 = (fenjie5<1)?8'hff:fenjie5;
+//       zhuhe4 = (fenjie4<1)?8'hff:fenjie4;
+//       zhuhe3 = (fenjie3<1)?8'hff:fenjie3;
+//       zhuhe2 = (fenjie2<1)?8'hff:fenjie2;
+//       zhuhe1 = (fenjie1<1)?8'hff:fenjie1;
+//end
+//end
+
+always @ (posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        part_in <= 64'd0;
+        end
+//    else if(timi != 0) begin
+    else if(1) begin
+       part_in = bufen1+bufen2+bufen3+bufen4+bufen5+bufen6+bufen7+bufen8;
+end
+end
+//always @ (posedge sys_clk or negedge sys_rst_n) begin
+//    if (!sys_rst_n) begin
+//        part2 <= 64'd0;
+//        end
+//    else if((flag1 == 4'd1)&&(part2 == 64'd0)) begin
+//       part2 = part_in;   
+//end
+//end
+
+//always @ (posedge sys_clk or negedge sys_rst_n) begin
+//    if (!sys_rst_n) begin
+//        part3 <= 64'd0;
+//        end
+//    else if(flag1 == 4'd1) begin
+//       part3 = part_in;       
+//end
+//end
+always @ (posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        led[15:8] <= 9'b000000000; 
+        part1 <= 64'd0;
+        part2 <= 64'd0;
+        part3 <= 64'd0;
+        part4 <= 64'd0;
+        part5 <= 64'd0;
+        part6 <= 64'd0;
+        part7 <= 64'd0;
+        part8 <= 64'd0;
+        part9 <= 64'd0;
+        end
+     else  if( 1 )  case( flag1 ) //flag1������һ������ÿ��һ���㷨�Ժ󣬴���ǰ������֣���ס���ܸı�
+//	                4'd0: ;
+	                4'd0:begin
+	                part1 = part_in;
+//	                led[15] = 1'b1;
+	                end
+	                
+	                4'd1:begin
+	                part2 = part_in;
+	                led[15] = 1'b1;
+	            case( flag2 )
+	                4'b0001: part_out = part1 + part2; 
+	                4'b0010: part_out = part1 - part2; 
+	                4'b0100: part_out = part1 * part2; 
+	                4'b1000: part_out = part1 / part2; 
+	                default:
+	                ;
+	            endcase
+	                part_out_1 = part_out;
+	                end
+	                
+	                4'd2:begin
+	                part3 = part_in;
+	                led[14] = 1'b1;
+	            case( flag2 )
+	                4'b0001: part_out = part_out_1 + part3; 
+	                4'b0010: part_out = part_out_1 - part3; 
+	                4'b0100: part_out = part_out_1 * part3; 
+	                4'b1000: part_out = part_out_1 / part3;          
+	                default:
+	                ;
+	            endcase
+	                part_out_2 = part_out;
+	                end
+	                
+	                4'd3:
+	                begin
+	                part4 = part_in;
+	                led[13] = 1'b1;
+//	                case( flag2 )
+//	                4'b0001: part_out = part_out_2 + part4; 
+//	                4'b0010: part_out = part_out_2 - part4;   
+//	                4'b0100: part_out = part_out_2 * part4; 
+//	                4'b1000: part_out = part_out_2 / part4;         
+//	                default:
+//	                ;
+//	            endcase
+//	                part_out_3 = part_out;
+	                end
+	                
+	                4'd4:
+	                begin
+	                part5 = part_in;
+//	                led[12] = 1'b1;
+//	                case( flag2 )
+//	                4'b0001: part_out = part_out_3 + part5; 
+//	                4'b0010: part_out = part_out_3 - part5;  
+//	                4'b0100: part_out = part_out_3 * part5; 
+//	                4'b1000: part_out = part_out_3 / part5;          
+//	                default:
+//	                ;
+//	            endcase
+//	                part_out_4 = part_out;
+	                end
+	                
+	                4'd5:
+	                begin
+	                part6 = part_in;
+	                led[11] = 1'b1;
+//	                case( flag2 )
+//	                4'b0001: part_out = part_out_4 + part6; 
+//	                4'b0010: part_out = part_out_4 - part6;   
+//	                4'b0100: part_out = part_out_4 * part6; 
+//	                4'b1000: part_out = part_out_4 / part6;        
+//	                default:
+//	                ;
+//	            endcase
+//	                part_out_5 = part_out;
+	                end
+	                
+	                4'd6:
+	                begin
+	                part7 = part_in;
+	                led[10] = 1'b1;
+//	                case( flag2 )
+//	                4'b0001: part_out = part_out_5 + part7; 
+//	                4'b0010: part_out = part_out_5 - part7;   
+//	                4'b0100: part_out = part_out_5 * part7; 
+//	                4'b1000: part_out = part_out_5 / part7;        
+//	                default:
+//	                ;
+//	            endcase
+//	                part_out_6 = part_out;
+	                end
+	                
+	                4'd7:
+	                begin
+	                part8 = part_in;
+	                led[9] = 1'b1;
+	                
+	                
+	                end
+	                
+	                4'd8:
+	                begin
+	                part9 = part_in;
+	                led[8] = 1'b1;
+	                end
+	                default:
+                       ;    
+	            endcase
+end
+
+//always @ (posedge sys_clk or negedge sys_rst_n) begin                           //ԭ�㷨
+//    if (!sys_rst_n) begin
+//        part_out <= 64'd0;
+//        end
+////    else if(flag1 == 4'hf) begin
+//    else if( 1 ) begin//ÿ����һ���㷨����Ӧ��ֱ�ӳ�������������ǵȵ����Ⱥ�
+//       part_out = part1 + part2 + part3 + part4 + part5 + part6 + part7; 
+//end
+//end
+
+//always @ (posedge sys_clk or negedge sys_rst_n) begin                                   //����1
+//    if (!sys_rst_n) begin
+//        part_out <= 64'd0;
+//        end
+//	 else if( 1 ) 
+//	            case( flag2 )
+//	                4'b0001: part_out = part1 + part2; 
+//	                default:
+//	                ;
+//	            endcase
+//end
+
+/*
+always @(posedge sys_clk or negedge sys_rst_n) begin
+    if (!sys_rst_n) begin
+        led <= 5'b00000; 
+	 numb_each[0]<=5'd0;
+	 numb_each[1]<=5'd10; 
+	 numb_each[2]<=5'd10;
+	 numb_each[3]<=5'd10;
+	 numb_each[4]<=5'd10; 
+	 numb_each[5]<=5'd10; 
+	 numb_each[6]<=5'd10; 
+	 numb_each[7]<=5'd10; 
+        end
+   else if( (key_flag & (key_value)) == 5'b00001) begin
+        led <= 5'b00001;
+        numb_each[0]<=5'd1;
+       end
+   else if( (key_flag & (key_value)) == 5'b00010 ) begin
+        led <= 5'b00010;
+        numb_each[1]<=5'd2;
+        end
+   else if((key_flag & (key_value)) == 5'b00100) begin
+        led <= 5'b00100;
+        numb_each[2]<=5'd3;
+        end   
+   else if( (key_flag & (key_value)) == 5'b01000) begin
+        led <= 5'b01000;
+        numb_each[3]<=5'd4;
+        end 
+   else if((key_flag & (key_value)) == 5'b10000) begin
+        led <= 5'b10000;
+        numb_each[4]<=5'd5;
+        end  
+   else  begin
+        //led <= 5'b00000; 
+        end    
+end
+*/
+    
+endmodule 
