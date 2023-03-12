@@ -1,0 +1,61 @@
+@@ -0,0 +1,78 @@
+
+
+
+module Tset(
+    input             sys_clk, 
+    input             sys_rst_n, 
+//    input    [4:0]  key,            //5������
+
+    input    [3:0]         key_1,              //�ⲿ��������3210�� 1234
+    output   [3:0]         key_2,              //�ⲿ��������3210��0123
+    output   [15:0]  led,            //4��LED��
+    
+	output     [7:0]  seg_cs_pin,
+	output     [7:0]  seg_data_0_pin,
+	output     [7:0]  seg_data_1_pin
+    );
+
+//wire [4:0] key_value;
+//wire [4:0] key_flag;
+
+//parameter wei=4'd2,numb=4'd5;
+wire     [3:0]          wei;  
+wire     [4:0]         numb;
+
+warning u_warning (
+    .sys_clk        (sys_clk),          //��������
+    .sys_rst_n       (sys_rst_n),
+    .led          (led),   
+    
+    .key_1            (key_1),
+    .key_2            (key_2),
+    
+    .wei            (wei),
+    .numb           (numb)
+
+//    .key_flag       (key_flag),
+//    .key_value      (key_value)
+    );    
+//key_debounce u_key_debounce(
+//    .sys_clk        (sys_clk),           //��������
+//    .sys_rst_n      (sys_rst_n),
+    
+//    .key            (key),
+//    .key_flag       (key_flag),
+//    .key_value      (key_value)
+//    );
+reg_show u_reg_show(
+    .sys_clk        (sys_clk),           //�����
+    .sys_rst_n      (sys_rst_n),
+
+    .wei            (wei),
+    .numb           (numb),
+    
+    .seg_cs_pin            (seg_cs_pin),
+    .seg_data_0_pin           (seg_data_0_pin),
+    .seg_data_1_pin           (seg_data_1_pin) 
+);    
+   
+    
+endmodule
